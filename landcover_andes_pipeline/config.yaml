@@ -1,0 +1,86 @@
+# Configuración Pipeline Cobertura Terrestre - Región Andina Colombia
+# Fuente: Planetary Computer (Esri 10m IO-LULC Annual v02, 2017-2022)
+# Clases: MapBiomas Colombia simplificado (7 clases)
+# Análisis: Matrices transición anuales + global + Getis-Ord Gi* hotspots
+
+aoi:
+  source: "gadm"
+  gadm_version: "4.1"
+  gadm_level: 1
+  andean_departments:
+    - "Antioquia"
+    - "Boyacá"
+    - "Caldas"
+    - "Cauca"
+    - "Cesar"
+    - "Cundinamarca"
+    - "Huila"
+    - "Nariño"
+    - "Norte de Santander"
+    - "Quindío"
+    - "Risaralda"
+    - "Santander"
+    - "Tolima"
+    - "Valle del Cauca"
+  buffer_km: 0
+  shapefile_path: null
+
+data:
+  collection: "io-lulc-annual-v02"
+  years: [2017, 2018, 2019, 2020, 2021, 2022]
+  max_cloud_cover: 100
+  resolution: 10
+  chunk_size: 256
+
+classes:
+  remap:
+    1: 5
+    2: 1
+    4: 7
+    5: 3
+    7: 4
+    8: 6
+    11: 2
+  nodata_values: [0, 9, 10]
+  class_names:
+    1: "Bosque"
+    2: "Pastizales"
+    3: "Cultivos"
+    4: "Urbano"
+    5: "Agua"
+    6: "Suelo desnudo"
+    7: "Humedales"
+
+change_detection:
+  annual_pairs: true
+  global_pair: [2017, 2022]
+  transition_codes: "from10+to"
+
+hotspots:
+  enabled: true
+  target_transitions:
+    - [1, 2]
+    - [1, 3]
+    - [1, 4]
+    - [2, 4]
+  weight_type: "queen"
+  distance_km: 1.0
+  permutations: 999
+  alpha: 0.05
+
+output:
+  base_dir: "C:/Users/Acer/Documentos/landcover_output/"
+  formats:
+    raster: ["COG"]
+    vector: ["GPKG"]
+  overwrite: false
+
+planetary_computer:
+  api_key: ""
+  timeout: 300
+  max_retries: 5
+  backoff_factor: 2
+
+logging:
+  level: "INFO"
+  file: "logs/pipeline.log"
